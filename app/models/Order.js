@@ -2,4 +2,4 @@ import { Schema, model } from "mongoose";
 
 const orderSchema = new Schema({});
 
-export const Order = model(orderSchema);
+export const Order = model("Order", orderSchema);
