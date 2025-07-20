@@ -20,7 +20,7 @@ const itemSchema = new Schema(
   { timestamps: true }
 );
 
-const cartSchema = new Schema(
+const wishlistSchema = new Schema(
   {
     usedId: {
       type: Schema.Types.ObjectId,
@@ -35,4 +35,4 @@ const cartSchema = new Schema(
   { timestamps: true }
 );
 
-export const Cart = model("Cart", cartSchema);
+export const Cart = model("Wishlist",wishlistSchema);

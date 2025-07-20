@@ -49,6 +49,9 @@ const productSchema = new Schema(
       type: String,
       required: true,
     },
+    previouslyPurchased: {
+      type: Boolean,
+    },
     variant: {
       type: Schema.Types.ObjectId,
       ref: "Variant",
@@ -64,4 +67,4 @@ const productSchema = new Schema(
   }
 );
 
-export const Product = model(productSchema);
+export const Product = model("Product", productSchema);

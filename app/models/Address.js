@@ -15,11 +15,11 @@ const addressSchema = new Schema(
       type: String,
       required: true,
     },
-    pincode: {
+    pinCode: {
       type: String,
       required: true,
     },
-    adressLine1: {
+    addressLine1: {
       type: String,
       required: true,
     },
@@ -45,4 +45,4 @@ const addressSchema = new Schema(
   { timestamps: true }
 );
 
-export const Address = model(addressSchema);
+export const Address = model('Address',addressSchema);

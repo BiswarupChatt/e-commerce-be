@@ -60,4 +60,4 @@ const VariantSchema = new Schema(
   }
 );
 
-export const Variant = model(VariantSchema);
+export const Variant = model("Wishlist", VariantSchema);
