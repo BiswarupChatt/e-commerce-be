@@ -45,4 +45,4 @@ const addressSchema = new Schema(
   { timestamps: true }
 );
 
-export const Address = model('Address',addressSchema);
+export const Address = model("Address", addressSchema);
