@@ -1,6 +1,7 @@
 import { Otp } from "../models/otp-model.js";
 import { User } from "../models/user-model.js";
-import { generateJwt } from "../utils/jwt.js";
+import { generateUserJwt } from "../utils/jwt.js";
+import bcrypt from "bcryptjs";
 
 export const sendOtp = async (req, res) => {
   const { phone, email, purpose } = req.body;
@@ -20,20 +21,23 @@ export const sendOtp = async (req, res) => {
       return res.status(409).json({ error: "User already exists" });
     }
   }
+
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedOtp = await bcrypt.hash(otp, 10);
+
   const expiry = new Date(Date.now() + 5 * 60 * 1000);
 
   await Otp.create({
     phone,
     email,
-    otp,
+    otp: hashedOtp,
     purpose,
     isUsed: false,
     attempts: 0,
     expiresAt: expiry,
   });
 
-  // otp sending logic will be here
+  // TODO: Send OTP via SMS/Email here
 
   return res.status(200).json({
     success: true,
@@ -71,26 +75,24 @@ export const verifyOtp = async (req, res) => {
       .json({ error: "No OTP request found or already used" });
   }
 
-  // Check if expired
   if (otpRecord.expiresAt < new Date()) {
     otpRecord.attempts += 1;
     await otpRecord.save();
     return res.status(400).json({ error: "OTP has expired" });
   }
 
-  // Check if attempts exceeded
   if (otpRecord.attempts >= 5) {
     return res.status(429).json({ error: "Too many attempts" });
   }
 
-  // Check if OTP is correct
-  if (otpRecord.otp !== inputOtp) {
+  const isOtpValid = await bcrypt.compare(inputOtp, otpRecord.otp);
+
+  if (!isOtpValid) {
     otpRecord.attempts += 1;
     await otpRecord.save();
     return res.status(400).json({ error: "Incorrect OTP" });
   }
 
-  // If everything is correct
   otpRecord.attempts += 1;
   otpRecord.isUsed = true;
   await otpRecord.save();
@@ -119,7 +121,7 @@ export const verifyOtp = async (req, res) => {
     }
   }
 
-  const token = generateJwt(user._id);
+  const token = generateUserJwt(user);
 
   return res.json({
     message: `User ${
