@@ -24,6 +24,10 @@ const otpSchema = new Schema(
       type: Number,
       required: true,
     },
+    expiresAt: {
+      type: Date,
+      required: true,
+    },
   },
   { timestamps: true }
 );
