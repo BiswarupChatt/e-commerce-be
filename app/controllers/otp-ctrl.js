@@ -1,6 +1,6 @@
 import { Otp } from "../models/otp-model.js";
 import { User } from "../models/user-model.js";
-import { generateJwt } from "../../utils/jwt.js";
+import { generateJwt } from "../utils/jwt.js";
 
 export const sendOtp = async (req, res) => {
   const { phone, email, purpose } = req.body;
@@ -14,7 +14,7 @@ export const sendOtp = async (req, res) => {
   }
 
   if (purpose === "registration") {
-    user = await User.findOne(phone ? { phone } : { email });
+    const user = await User.findOne(phone ? { phone } : { email });
 
     if (user) {
       return res.status(409).json({ error: "User already exists" });
