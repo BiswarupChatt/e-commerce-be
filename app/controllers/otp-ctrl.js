@@ -4,22 +4,20 @@ import { generateUserJwt } from "../utils/jwt.js";
 import bcrypt from "bcryptjs";
 
 export const sendOtp = async (req, res) => {
-  const { phone, email, purpose } = req.body;
+  const { phone, email } = req.body;
 
   if (!phone && !email) {
     return res.status(400).json({ error: "Phone or email is required" });
   }
 
-  if (!["registration", "login"].includes(purpose)) {
-    return res.status(400).json({ error: "Invalid OTP purpose" });
-  }
+  const user = await User.findOne(phone ? { phone } : { email });
 
-  if (purpose === "registration") {
-    const user = await User.findOne(phone ? { phone } : { email });
+  let isExisting = true;
 
-    if (user) {
-      return res.status(409).json({ error: "User already exists" });
-    }
+  if (!user) {
+    isExisting = false;
+  } else {
+    isExisting = true;
   }
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -31,7 +29,7 @@ export const sendOtp = async (req, res) => {
     phone,
     email,
     otp: hashedOtp,
-    purpose,
+    isExisting,
     isUsed: false,
     attempts: 0,
     expiresAt: expiry,
@@ -44,7 +42,7 @@ export const sendOtp = async (req, res) => {
     message: "OTP sent successfully",
     data: {
       deliveryMethod: phone ? "sms" : "email",
-      purpose,
+      isExisting,
       otp,
       expiresIn: "5 minutes",
     },

@@ -2,12 +2,7 @@
 import { check, body } from "express-validator";
 
 export const sendOtpValidation = [
-  body("purpose")
-    .notEmpty()
-    .withMessage("Purpose is required")
-    .isIn(["login", "registration"])
-    .withMessage("Purpose must be either 'login' or 'registration'"),
-
+  
   body("phone").optional().isMobilePhone().withMessage("Invalid phone number"),
 
   body("email").optional().isEmail().withMessage("Invalid email address"),

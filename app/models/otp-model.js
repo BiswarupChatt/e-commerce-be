@@ -11,9 +11,8 @@ const otpSchema = new Schema(
       type: String,
       required: true,
     },
-    purpose: {
-      type: String,
-      enum: ["login", "registration"],
+    isExisting: {
+      type: Boolean,
       required: true,
     },
     isUsed: {
