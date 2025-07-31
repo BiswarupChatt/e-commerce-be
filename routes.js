@@ -1,9 +1,14 @@
 import express from "express";
 import { userCtrl } from "./app/controllers/user-ctrl.js";
-import { sendOtp, verifyOtp } from "./app/controllers/otp-ctrl.js";
+import {
+  sendOtp,
+  verifyLoginOtp,
+  verifySignupOtp,
+} from "./app/controllers/otp-ctrl.js";
 import {
   sendOtpValidation,
-  verifyOtpValidation,
+  verifyLoginOtpValidation,
+  verifySignupOtpValidation,
 } from "./app/validations/otp-validation.js";
 import { validate } from "./app/middlewares/validate.js";
 
@@ -14,4 +19,15 @@ routes.get("/login", userCtrl.get);
 
 // ** otp route **
 routes.post("/send-otp", sendOtpValidation, validate, sendOtp);
-routes.post("/verify-otp", verifyOtpValidation, validate, verifyOtp);
+routes.post(
+  "/verify-signup-otp",
+  verifySignupOtpValidation,
+  validate,
+  verifySignupOtp
+);
+routes.post(
+  "/verify-login-otp",
+  verifyLoginOtpValidation,
+  validate,
+  verifyLoginOtp
+);

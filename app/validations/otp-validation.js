@@ -1,12 +1,10 @@
 // validations/otpValidation.js
-import { check, body } from "express-validator";
+import { body } from "express-validator";
 
-export const sendOtpValidation = [
-  
+// Shared validation: phone/email required
+const contactValidation = [
   body("phone").optional().isMobilePhone().withMessage("Invalid phone number"),
-
   body("email").optional().isEmail().withMessage("Invalid email address"),
-
   body().custom((value) => {
     if (!value.phone && !value.email) {
       throw new Error("Either phone or email is required");
@@ -15,7 +13,11 @@ export const sendOtpValidation = [
   }),
 ];
 
-export const verifyOtpValidation = [
+// Validation for sending OTP (either phone or email)
+export const sendOtpValidation = [...contactValidation];
+
+// Validation for verifying signup OTP
+export const verifySignupOtpValidation = [
   body("otp")
     .notEmpty()
     .withMessage("OTP is required")
@@ -24,33 +26,26 @@ export const verifyOtpValidation = [
     .isNumeric()
     .withMessage("OTP must be numeric"),
 
-  body("purpose")
+  ...contactValidation,
+
+  body("firstName")
     .notEmpty()
-    .withMessage("Purpose is required")
-    .isIn(["login", "registration"])
-    .withMessage("Purpose must be login or registration"),
+    .withMessage("First name is required for registration"),
 
-  body("phone").optional().isMobilePhone().withMessage("Invalid phone number"),
+  body("lastName")
+    .notEmpty()
+    .withMessage("Last name is required for registration"),
+];
 
-  body("email").optional().isEmail().withMessage("Invalid email address"),
+// Validation for verifying login OTP
+export const verifyLoginOtpValidation = [
+  body("otp")
+    .notEmpty()
+    .withMessage("OTP is required")
+    .isLength({ min: 6, max: 6 })
+    .withMessage("OTP must be 6 digits")
+    .isNumeric()
+    .withMessage("OTP must be numeric"),
 
-  // Custom validator: ensure either phone or email is present
-  body().custom((value) => {
-    if (!value.phone && !value.email) {
-      throw new Error("Either phone or email is required");
-    }
-    return true;
-  }),
-
-  // Custom validator: if purpose is registration, firstName and lastName are required
-  body().custom((value) => {
-    if (value.purpose === "registration") {
-      if (!value.firstName || !value.lastName) {
-        throw new Error(
-          "First name and last name are required for registration"
-        );
-      }
-    }
-    return true;
-  }),
+  ...contactValidation,
 ];

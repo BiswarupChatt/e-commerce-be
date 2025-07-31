@@ -5,11 +5,12 @@ export const generateUserJwt = (user) => {
     _id: user._id,
     phone: user.phone,
     email: user.email,
+    role: user.role,
     firstName: user.firstName,
     lastName: user.lastName,
     isVerified: user.isVerified,
     isActive: user.isActive,
   };
 
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "700d" });
 };

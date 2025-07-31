@@ -49,20 +49,12 @@ export const sendOtp = async (req, res) => {
   });
 };
 
-export const verifyOtp = async (req, res) => {
-  const {
-    phone,
-    email,
-    otp: inputOtp,
-    purpose,
-    firstName,
-    lastName,
-  } = req.body;
+export const verifySignupOtp = async (req, res) => {
+  const { phone, email, otp: inputOtp, firstName, lastName } = req.body;
 
   const query = {
-    $or: [{ phone }, { email }],
-    purpose,
     isUsed: false,
+    ...(phone ? { phone } : { email }),
   };
 
   const otpRecord = await Otp.findOne(query).sort({ createdAt: -1 });
@@ -95,36 +87,77 @@ export const verifyOtp = async (req, res) => {
   otpRecord.isUsed = true;
   await otpRecord.save();
 
-  let user;
-  if (purpose === "registration") {
-    user = await User.findOne(phone ? { phone } : { email });
+  const existingUser = await User.findOne(phone ? { phone } : { email });
+  if (existingUser) {
+    return res.status(409).json({ error: "User already exists" });
+  }
 
-    if (user) {
-      return res.status(409).json({ error: "User already exists" });
-    }
+  const newUser = await User.create({
+    phone,
+    email,
+    firstName,
+    lastName,
+    role: "user",
+    isVerified: true,
+    isActive: true,
+  });
 
-    user = await User.create({
-      phone,
-      email,
-      firstName,
-      lastName,
-      isVerified: true,
-      isActive: true,
-    });
-  } else if (purpose === "login") {
-    user = await User.findOne(phone ? { phone } : { email });
+  const token = generateUserJwt(newUser);
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+  return res.json({
+    message: "User registered successfully",
+    token,
+    user: newUser,
+  });
+};
+
+export const verifyLoginOtp = async (req, res) => {
+  const { phone, email, otp: inputOtp } = req.body;
+
+  const query = {
+    isUsed: false,
+    ...(phone ? { phone } : { email }),
+  };
+
+  const otpRecord = await Otp.findOne(query).sort({ createdAt: -1 });
+
+  if (!otpRecord) {
+    return res
+      .status(400)
+      .json({ error: "No OTP request found or already used" });
+  }
+
+  if (otpRecord.expiresAt < new Date()) {
+    otpRecord.attempts += 1;
+    await otpRecord.save();
+    return res.status(400).json({ error: "OTP has expired" });
+  }
+
+  if (otpRecord.attempts >= 5) {
+    return res.status(429).json({ error: "Too many attempts" });
+  }
+
+  const isOtpValid = await bcrypt.compare(inputOtp, otpRecord.otp);
+
+  if (!isOtpValid) {
+    otpRecord.attempts += 1;
+    await otpRecord.save();
+    return res.status(400).json({ error: "Incorrect OTP" });
+  }
+
+  otpRecord.attempts += 1;
+  otpRecord.isUsed = true;
+  await otpRecord.save();
+
+  const user = await User.findOne(phone ? { phone } : { email });
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
   }
 
   const token = generateUserJwt(user);
 
   return res.json({
-    message: `User ${
-      purpose === "registration" ? "Register" : "Login"
-    } successfully`,
+    message: "User logged in successfully",
     token,
     user,
   });
