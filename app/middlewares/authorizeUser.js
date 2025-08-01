@@ -19,3 +19,12 @@ export const AuthorizeUser = (...allowedRoles) => {
     next();
   };
 };
+
+export const requireVerified = (req, res, next) => {
+  if (!req.isVerified) {
+    return res
+      .status(403)
+      .json({ message: "Email not verified. Access denied." });
+  }
+  next();
+};

@@ -8,7 +8,7 @@ export const authenticateToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded._id; 
+    req.userId = decoded._id;
     req.role = decoded.role;
     req.isVerified = decoded.isVerified;
     req.isActive = decoded.isActive;

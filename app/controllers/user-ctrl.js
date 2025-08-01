@@ -16,3 +16,17 @@ export const getUser = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ message: "No users found." });
+    }
+    res.status(200).json({ users });
+  } catch (err) {
+    console.error("Error in getAllUsers:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

@@ -1,7 +1,7 @@
 import express from "express";
 
 //controllers
-import { getUser } from "./app/controllers/user-ctrl.js";
+import { getUser, getAllUsers } from "./app/controllers/user-ctrl.js";
 import {
   sendOtp,
   verifyLoginOtp,
@@ -18,11 +18,23 @@ import {
 //middlewares
 import { validate } from "./app/middlewares/validate.js";
 import { authenticateToken } from "./app/middlewares/authMiddleware.js";
+import { AuthorizeUser } from "./app/middlewares/authorizeUser.js";
 
 export const routes = express.Router();
 
 // ** user route **
-routes.get("/user/get", authenticateToken, getUser);
+routes.get(
+  "/user/get",
+  authenticateToken,
+  AuthorizeUser("user", "admin"),
+  getUser
+);
+routes.get(
+  "/user/get-all",
+  authenticateToken,
+  AuthorizeUser("admin"),
+  getAllUsers
+);
 
 // ** otp route **
 routes.post("/otp/send-otp", sendOtpValidation, validate, sendOtp);
