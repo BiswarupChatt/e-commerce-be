@@ -1,14 +1,18 @@
-export const userCtrl = {};
 import { User } from "../models/user-model.js";
 
-userCtrl.get = async (req, res) => {
+export const getUser = async (req, res) => {
   try {
-    return res.json({
-      msg: "balle balle",
-    });
+    const userId = req.userId;
+
+    const user = await User.findById(userId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    res.status(200).json({ user });
   } catch (error) {
-    res.status(400).json({
-      msg: "error",
-    });
+    console.error("Error in getUser:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

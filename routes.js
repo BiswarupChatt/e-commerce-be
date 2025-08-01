@@ -1,32 +1,39 @@
 import express from "express";
-import { userCtrl } from "./app/controllers/user-ctrl.js";
+
+//controllers
+import { getUser } from "./app/controllers/user-ctrl.js";
 import {
   sendOtp,
   verifyLoginOtp,
   verifySignupOtp,
 } from "./app/controllers/otp-ctrl.js";
+
+//validations
 import {
   sendOtpValidation,
   verifyLoginOtpValidation,
   verifySignupOtpValidation,
 } from "./app/validations/otp-validation.js";
+
+//middlewares
 import { validate } from "./app/middlewares/validate.js";
+import { authenticateToken } from "./app/middlewares/authMiddleware.js";
 
 export const routes = express.Router();
 
 // ** user route **
-routes.get("/login", userCtrl.get);
+routes.get("/user/get", authenticateToken, getUser);
 
 // ** otp route **
-routes.post("/send-otp", sendOtpValidation, validate, sendOtp);
+routes.post("/otp/send-otp", sendOtpValidation, validate, sendOtp);
 routes.post(
-  "/verify-signup-otp",
+  "/otp/verify-signup-otp",
   verifySignupOtpValidation,
   validate,
   verifySignupOtp
 );
 routes.post(
-  "/verify-login-otp",
+  "/otp/verify-login-otp",
   verifyLoginOtpValidation,
   validate,
   verifyLoginOtp

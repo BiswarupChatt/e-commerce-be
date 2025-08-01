@@ -17,7 +17,7 @@ const userSchema = new Schema(
       type: String,
     },
     isVerified: {
-      type: String,
+      type: Boolean,
     },
     role: { type: String, enum: ["user", "admin"] },
     gender: {
