@@ -17,7 +17,7 @@ import {
 
 //middlewares
 import { validate } from "./app/middlewares/validate.js";
-import { authenticateToken } from "./app/middlewares/authMiddleware.js";
+import { authenticateUser } from "./app/middlewares/authenticateUser.js";
 import { AuthorizeUser } from "./app/middlewares/authorizeUser.js";
 
 export const routes = express.Router();
@@ -25,13 +25,13 @@ export const routes = express.Router();
 // ** user route **
 routes.get(
   "/user/get",
-  authenticateToken,
+  authenticateUser,
   AuthorizeUser("user", "admin"),
   getUser
 );
 routes.get(
   "/user/get-all",
-  authenticateToken,
+  authenticateUser,
   AuthorizeUser("admin"),
   getAllUsers
 );
