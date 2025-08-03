@@ -32,16 +32,40 @@ export const createCategory = async (req, res) => {
   }
 };
 
-
 export const getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.find().sort({ createdAt: -1 });
+    const {
+      search = "",
+      sortBy = "createdAt",
+      sortOrder = "desc",
+      page = 1,
+      limit = 10,
+    } = req.query;
 
-    if (!categories || categories.length === 0) {
-      return res.status(404).json({ message: "No categories found." });
-    }
+    const query = {
+      $or: [
+        { name: { $regex: search, $options: "i" } },
+        { slug: { $regex: search, $options: "i" } },
+      ],
+    };
 
-    res.status(200).json({ categories });
+    const sortOptions = {
+      [sortBy]: sortOrder === "asc" ? 1 : -1,
+    };
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const [categories, totalCount] = await Promise.all([
+      Category.find(query).sort(sortOptions).skip(skip).limit(parseInt(limit)),
+      Category.countDocuments(query),
+    ]);
+
+    res.status(200).json({
+      totalCount,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(totalCount / limit),
+      categories,
+    });
   } catch (error) {
     console.error("Error fetching categories:", error);
     res.status(500).json({ message: "Server error.", error });

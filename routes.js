@@ -44,3 +44,4 @@ routes.get("/category/get-all", authenticateUser, AuthorizeUser("admin"), getAll
 routes.get("/category/get/:id", authenticateUser, AuthorizeUser("admin"), getCategoryById);
 routes.put("/category/update/:id", updateCategoryValidation, validate, authenticateUser, AuthorizeUser("admin"), updateCategory);
 routes.delete("/category/delete/:id", authenticateUser, AuthorizeUser("admin"), deleteCategory);
+
