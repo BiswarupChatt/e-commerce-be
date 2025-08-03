@@ -4,11 +4,13 @@ import express from "express";
 //controllers
 import { sendOtp, verifyLoginOtp, verifySignupOtp } from "./app/controllers/otp-ctrl.js";
 import { getAllUsers, editUser, getUserById, getMyProfile } from "./app/controllers/user-ctrl.js";
+import { createCategory, deleteCategory, getAllCategories, getCategoryById, updateCategory } from "./app/controllers/category-ctrl.js";
 
 //validations
 import { sendOtpValidation, verifyLoginOtpValidation, verifySignupOtpValidation } from "./app/validations/otp-validation.js";
 import { editUserValidation } from "./app/validations/user-validation.js";
-import { createAddressValidation } from "./app/validations/address-validation.js";
+import { createAddressValidation, editAddressValidation } from "./app/validations/address-validation.js";
+import { createCategoryValidation, updateCategoryValidation } from "./app/validations/category-validation.js";
 
 //middlewares
 import { validate } from "./app/middlewares/validate.js";
@@ -33,5 +35,12 @@ routes.put("/user/edit/:id", editUserValidation, validate, authenticateUser, Aut
 // **** address route ****
 routes.post("/address/create", createAddressValidation, validate, authenticateUser, AuthorizeUser("user", "admin"), createAddress);
 routes.get("/address/get-all", authenticateUser, AuthorizeUser("user", "admin"), getAllAddress);
-routes.put("/address/edit/:id", createAddressValidation, validate, authenticateUser, AuthorizeUser("user", "admin"), editAddress);
+routes.put("/address/edit/:id", editAddressValidation, validate, authenticateUser, AuthorizeUser("user", "admin"), editAddress);
 routes.delete("/address/delete/:id", authenticateUser, AuthorizeUser("user", "admin"), deleteAddress);
+
+// **** category route ****
+routes.post("/category/create", createCategoryValidation, validate, authenticateUser, AuthorizeUser("admin"), createCategory);
+routes.get("/category/get-all", authenticateUser, AuthorizeUser("admin"), getAllCategories);
+routes.get("/category/get/:id", authenticateUser, AuthorizeUser("admin"), getCategoryById);
+routes.put("/category/update/:id", updateCategoryValidation, validate, authenticateUser, AuthorizeUser("admin"), updateCategory);
+routes.delete("/category/delete/:id", authenticateUser, AuthorizeUser("admin"), deleteCategory);
