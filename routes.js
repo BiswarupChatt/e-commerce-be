@@ -8,12 +8,12 @@ import { getAllUsers, editUser, getUserById, getMyProfile } from "./app/controll
 //validations
 import { sendOtpValidation, verifyLoginOtpValidation, verifySignupOtpValidation } from "./app/validations/otp-validation.js";
 import { editUserValidation } from "./app/validations/user-validation.js";
+import { createAddressValidation } from "./app/validations/address-validation.js";
 
 //middlewares
 import { validate } from "./app/middlewares/validate.js";
 import { authenticateUser } from "./app/middlewares/authenticateUser.js";
 import { AuthorizeUser } from "./app/middlewares/authorizeUser.js";
-import { createAddressValidation } from "./app/validations/address-validation.js";
 import { createAddress, deleteAddress, editAddress, getAllAddress } from "./app/controllers/address-ctrl.js";
 
 export const routes = express.Router();
