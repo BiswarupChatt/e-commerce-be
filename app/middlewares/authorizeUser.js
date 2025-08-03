@@ -2,6 +2,8 @@ export const AuthorizeUser = (...allowedRoles) => {
   return (req, res, next) => {
     const { role, isActive } = req.user;
 
+    console.log(req.user)
+
     if (!role) {
       return res.status(401).json({ message: "User role not found in token." });
     }
